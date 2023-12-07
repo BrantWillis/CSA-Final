@@ -4,6 +4,7 @@ public class Player {
     int money = 1500;
     int jailFree = 0;
     //int monopolies = 0;
+    Boolean passGo = false;
     int position = 0;
     Boolean jailed = false;
     ArrayList<Integer> monopolies;
@@ -132,15 +133,40 @@ public class Player {
         }
     }
 
-    public Boolean canBuyHouses() {
-        for (int i = 0; i < monopolies.size(); i++) {
-
-        }
-        return true;
+    public void setMoney(int amt) {
+        money = amt;
     }
 
-    public int getHouses(int color) {
-        
+    public int getMoney() {
+        return money;
+    }
+
+    public Boolean canBuyHouses() {
+        for (int i = 0; i < 8; i++) {
+            //check if an owned monopoly has less than 5 houses per property
+            if(monopolies.contains(i) && ((i == 0 || i == 7) && getMonopolyHouses(i) < 10) || ((i > 0 && i < 7) && getMonopolyHouses(i) < 15)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getMonopolyHouses(int color) { //total houses in a monopoly
+        int house = 0;
+        for(int i = 0; i < playerProperties.size(); i++) {
+            if (playerProperties.get(i).getColor() == color) {
+                house += playerProperties.get(i).getHouses();
+            }
+        }
+        return house;
+    }
+
+    public int getTotalHouses() { //total number of houses the player has
+        int house = 0;
+        for (int i = 0; i < playerProperties.size(); i++) {
+            house += playerProperties.get(i).getHouses();
+        }
+        return house;
     }
 
     public int getMonopolies() {
@@ -156,6 +182,9 @@ public class Player {
 
     public void setJailed(Boolean x) {
         jailed = x;
+        if(jailed) {
+            position = 10;
+        }
     }
 
     public Boolean getJailed() {
@@ -164,6 +193,19 @@ public class Player {
 
     public void setPosition(int pos) {
         position = pos;
+        if (position > 39) {
+            position -= 39;
+            passGo = true;
+        }
+    }
+
+    public Boolean hasProperty(Property prop) {
+        for (int i = 0; i < playerProperties.size(); i++) {
+            if (playerProperties.get(i).getPosition() == prop.getPosition()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getPosition() {
@@ -172,6 +214,10 @@ public class Player {
 
     public int getPropertyCount() {
         return playerProperties.size();
+    }
+
+    public int getGOOJF() {
+        return jailFree;
     }
 
 }

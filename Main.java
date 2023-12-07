@@ -140,7 +140,7 @@ public class Main {
         int j = 10;
         while(j > 0) {
             for(int i = 1; i < players.size(); i++) { //skip free parking
-                game.takeTurn(players.get(i), 0);
+                game.takeTurn(players.get(i), 0, controller);
             }
             j--;
         }

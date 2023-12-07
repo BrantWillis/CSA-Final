@@ -21,6 +21,8 @@ public class Property {
         currentRent = rents[0];
     }
 
+    public Property() {}
+
     private void fixName(String word) {
         String first = word.substring(0,7);
         String second = word.substring(7);
@@ -46,6 +48,10 @@ public class Property {
 
     public Boolean getMortgaged() {
         return mortgaged;
+    }
+
+    public int getPosition() {
+        return position;
     }
 
     public int getHouses() {
