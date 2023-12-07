@@ -9,15 +9,17 @@ class Grid {
     public Grid(int rows, int cols) {
         grid = new char[rows][cols];
         gridColorsChar = new char[rows][cols];
+        //change gridColorsChar from char to string here
         for(int i = 0; i < rows; i++) {
             for(int j = 0; j < cols; j++) {
-                //make full display
+                //make full display with setCell
             }
         }
     }
 
-    public void setCell(int row, int col, char value) {
+    public void setCell(int row, int col, char value, String valueColor) {
         grid[row][col] = value;
+        gridColors[row][col] = valueColor;
     }
 
     public char[][] getGrid() {
@@ -54,8 +56,8 @@ class GridController {
         view.displayGrid(model.getGrid(), model.getGridColors());
     }
 
-    public void setCell(int row, int col, char value) {
-        model.setCell(row, col, value);
+    public void setCell(int row, int col, char value, String valueColor) {
+        model.setCell(row, col, value, valueColor);
     }
 }
 
