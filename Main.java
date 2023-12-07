@@ -100,12 +100,14 @@ public class Main {
         ArrayList<Property> player2Props = new ArrayList<Property>();
         ArrayList<Property> player3Props = new ArrayList<Property>();
         ArrayList<Property> player4Props = new ArrayList<Property>();
+        ArrayList<Property> freeParkProps = new ArrayList<Property>();
         
 
         Player a = new Player(player1Props);
         Player b = new Player(player2Props);
         Player c = new Player(player3Props);
         Player d = new Player(player4Props);
+        Player freeParking = new Player(freeParkProps);
 
 
         ArrayList<Player> players = new ArrayList<Player>();
@@ -116,10 +118,19 @@ public class Main {
             System.out.println("How many players are there? (2-4)");
             num = Integer.parseInt(scan.nextLine());
         }
+        players.add(freeParking);
         players.add(a);
         players.add(b);
         if(num == 3) players.add(c);
         if(num == 4) players.add(d);
+
+        /*players arraylist
+        0 - free parking
+        1 - player 1
+        2 - player 2
+        3 - player 3 (if there)
+        4 - player 4 (if there)
+        */
 
         GameController game = new GameController(props, players);
         Grid model = new Grid(91, 91);
@@ -128,8 +139,8 @@ public class Main {
 
         int j = 10;
         while(j > 0) {
-            for(int i = 0; i < players.size(); i++) {
-                while(game.takeTurn(players.get(i))) {}
+            for(int i = 1; i < players.size(); i++) { //skip free parking
+                game.takeTurn(players.get(i), 0);
             }
             j--;
         }

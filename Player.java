@@ -3,7 +3,9 @@ import java.util.ArrayList;
 public class Player {
     int money = 1500;
     int jailFree = 0;
+    //int monopolies = 0;
     int position = 0;
+    Boolean jailed = false;
     ArrayList<Integer> monopolies;
     ArrayList<Property> playerProperties;
 
@@ -30,11 +32,13 @@ public class Player {
             }
         } else if (toUpdate.getColor() != 0 && toUpdate.getColor() != 7) { //all 3-property monopolies
             if(pos.size() == 3) { //only change something if monopoly is owned
+                monopolies.add(playerProperties.get(pos.get(0)).getColor());
                 ArrayList<Integer> houses = getHouseCount(pos);
                 for (int i = 0; i < pos.size(); i++) {
                     changeRent(pos.get(i), 1 + houses.get(i)); //sets rent to doubled rent position + number of houses
                 }
             } else if (pos.size() < 3 && getRentPos(toUpdate) != 0) { //if not a monopoly but rent is larger than initial
+                monopolies.remove(playerProperties.get(pos.get(0)).getColor());
                 for(int i : pos) {
                     changeRent(i, 0);
                 }
@@ -42,10 +46,12 @@ public class Player {
         } else { //dark blue & purple properties
             if(pos.size() == 2) { //only change something if monopoly is owned
                 ArrayList<Integer> houses = getHouseCount(pos);
+                monopolies.add(playerProperties.get(pos.get(0)).getColor());
                 for (int i = 0; i < pos.size(); i++) {
                     changeRent(pos.get(i), 1 + houses.get(i)); //sets rent to doubled rent position + number of houses
                 }
             } else if (pos.size() < 2 && getRentPos(toUpdate) != 0) { //if not a monopoly but rent is larger than initial
+                monopolies.remove(playerProperties.get(pos.get(0)).getColor());
                 for(int i : pos) {
                     changeRent(i, 0);
                 }
@@ -115,4 +121,57 @@ public class Player {
         removeProperty(prop);
         p.addProperty(prop);
     }
+
+    public void giveMoney(Player p, int amt) {
+        if(checkMoney(amt)) {
+            money -= amt;
+            p.money += amt;
+        }
+        else {
+            System.out.println("You cannot afford this.");
+        }
+    }
+
+    public Boolean canBuyHouses() {
+        for (int i = 0; i < monopolies.size(); i++) {
+
+        }
+        return true;
+    }
+
+    public int getHouses(int color) {
+        
+    }
+
+    public int getMonopolies() {
+        return monopolies.size();
+    }
+
+    public Boolean checkMoney(int amt) {
+        if(money - amt < 0) {
+            return false;
+        }
+        return true;
+    }
+
+    public void setJailed(Boolean x) {
+        jailed = x;
+    }
+
+    public Boolean getJailed() {
+        return jailed;
+    }
+
+    public void setPosition(int pos) {
+        position = pos;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public int getPropertyCount() {
+        return playerProperties.size();
+    }
+
 }
