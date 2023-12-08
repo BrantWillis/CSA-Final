@@ -3,15 +3,18 @@ import java.util.ArrayList;
 public class Player {
     int money = 1500;
     int jailFree = 0;
+    int jailTurns;
+    int ID;
     //int monopolies = 0;
     Boolean passGo = false;
     int position = 0;
     Boolean jailed = false;
-    ArrayList<Integer> monopolies;
+    ArrayList<Integer> monopolies = new ArrayList<Integer>();
     ArrayList<Property> playerProperties;
 
-    public Player(ArrayList<Property> properties) {
+    public Player(ArrayList<Property> properties, int ID) {
         this.playerProperties = properties;
+        this.ID = ID;
     }
 
     //called when a person buys a house, sells a house, buys a property, or mortgages/sells a property
@@ -33,7 +36,9 @@ public class Player {
             }
         } else if (toUpdate.getColor() != 0 && toUpdate.getColor() != 7) { //all 3-property monopolies
             if(pos.size() == 3) { //only change something if monopoly is owned
-                monopolies.add(playerProperties.get(pos.get(0)).getColor());
+                if(monopolies.indexOf(playerProperties.get(pos.get(0)).getColor()) == -1) { //if monopoly is new
+                    monopolies.add(playerProperties.get(pos.get(0)).getColor());
+                }
                 ArrayList<Integer> houses = getHouseCount(pos);
                 for (int i = 0; i < pos.size(); i++) {
                     changeRent(pos.get(i), 1 + houses.get(i)); //sets rent to doubled rent position + number of houses
@@ -47,7 +52,9 @@ public class Player {
         } else { //dark blue & purple properties
             if(pos.size() == 2) { //only change something if monopoly is owned
                 ArrayList<Integer> houses = getHouseCount(pos);
-                monopolies.add(playerProperties.get(pos.get(0)).getColor());
+                if(monopolies.indexOf(playerProperties.get(pos.get(0)).getColor()) == -1) { //if monopoly is new
+                    monopolies.add(playerProperties.get(pos.get(0)).getColor());
+                }
                 for (int i = 0; i < pos.size(); i++) {
                     changeRent(pos.get(i), 1 + houses.get(i)); //sets rent to doubled rent position + number of houses
                 }
@@ -87,6 +94,22 @@ public class Player {
         updateRent(playerProperties.get(playerProperties.size() - 1));
     }
 
+    public int getID() {
+        return ID;
+    }
+
+    public Boolean getGo() {
+        return passGo;
+    }
+
+    public ArrayList<Integer> getAllMonopolies() {
+        return monopolies;
+    }
+
+    public void setGo(Boolean x) {
+        passGo = x;
+    }
+
     public void removeProperty(Property prop) { //if property is traded away (prereq has no houses)
         for (int i = 0; i < playerProperties.size(); i++) {
             if (prop == playerProperties.get(i)) {
@@ -101,9 +124,28 @@ public class Player {
         updateRent(prop);
     }
 
-    public void removeHouse(Property prop) {
+    public void removeHouse(Property prop) { //remove house from a specific property
         prop.setHouses(prop.getHouses() - 1);
+        money += ((prop.getColor() + 2)/2) * 25;
         updateRent(prop);
+    }
+
+    public void removeHouse(int monopoly) { //remove house from a monopoly
+        ArrayList<Integer> props = new ArrayList<Integer>();
+        for(int i = 0; i < playerProperties.size(); i++) { //get an arraylist containing each property in the monopoly
+            if (playerProperties.get(i).getColor() == monopoly) {
+                props.add(i);
+            }
+        }
+        int mostHousesPos = -1;
+        int mostHouses = 0;
+        for(int i = 0; i < props.size(); i++) {
+            if(playerProperties.get(props.get(i)).getHouses() > mostHouses) {
+                mostHouses = playerProperties.get(props.get(i)).getHouses();
+                mostHousesPos = i;
+            }
+        }
+        removeHouse(playerProperties.get(props.get(mostHousesPos)));
     }
 
     public void mortgageProperty(Property prop) {
@@ -141,14 +183,23 @@ public class Player {
         return money;
     }
 
+    /*monopolies vector
+        has color of each owned monopoly
+    */
+
     public Boolean canBuyHouses() {
+        Boolean openSpots = false;
+        int costCheapestHouse = 200;
         for (int i = 0; i < 8; i++) {
             //check if an owned monopoly has less than 5 houses per property
             if(monopolies.contains(i) && ((i == 0 || i == 7) && getMonopolyHouses(i) < 10) || ((i > 0 && i < 7) && getMonopolyHouses(i) < 15)) {
-                return true;
+                openSpots = true;
+                if(Math.ceil((i + 1)/2)*50 < costCheapestHouse) {//if monopoly's house cost is the lowest
+                    costCheapestHouse = (int)Math.ceil((i + 1)/2)*50;
+                }
             }
         }
-        return false;
+        return openSpots && money >= costCheapestHouse; //open spots and affordable
     }
 
     public int getMonopolyHouses(int color) { //total houses in a monopoly
@@ -184,7 +235,16 @@ public class Player {
         jailed = x;
         if(jailed) {
             position = 10;
+            jailTurns = 3;
         }
+    }
+
+    public void setJailTurns(int amt) {
+        jailTurns = amt;
+    }
+
+    public int getJailTurns() {
+        return jailTurns;
     }
 
     public Boolean getJailed() {
