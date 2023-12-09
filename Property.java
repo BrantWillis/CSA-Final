@@ -12,13 +12,14 @@ public class Property {
     private int houses = 0;
     private Boolean mortgaged = false;
 
-    public Property(String name, String longName, int color, int position, int[] rents) {
+    public Property(String name, String longName, int color, int position, int[] rents, int cost) {
         fixName(longName);
         this.name = name;
         this.color = color;
         this.position = position;
         this.rents = rents;
         currentRent = rents[0];
+        this.cost = cost;
     }
 
     public Property() {}

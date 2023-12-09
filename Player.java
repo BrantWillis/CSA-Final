@@ -148,6 +148,32 @@ public class Player {
         removeHouse(playerProperties.get(props.get(mostHousesPos)));
     }
 
+    public int getMaxMonopolyHouses(int monopoly) {
+        if(monopoly == 0 || monopoly == 7) {
+            return 10;
+        } else{
+            return 15;
+        }
+    }
+
+    public void addHouse(int monopoly) {
+        ArrayList<Integer> props = new ArrayList<Integer>();
+        for(int i = 0; i < playerProperties.size(); i++) { //get an arraylist containing each property in the monopoly
+            if (playerProperties.get(i).getColor() == monopoly) {
+                props.add(i);
+            }
+        }
+        int leastHousesPos = 10;
+        int leastHouses = 10;
+        for(int i = 0; i < props.size(); i++) {
+            if(playerProperties.get(props.get(i)).getHouses() < leastHouses) {
+                leastHouses = playerProperties.get(props.get(i)).getHouses();
+                leastHousesPos = i;
+            }
+        }
+        addHouse(playerProperties.get(props.get(leastHousesPos)));
+    }
+
     public void mortgageProperty(Property prop) {
         prop.setMortgage(true);
         money += prop.getCost() / 2;
@@ -166,13 +192,8 @@ public class Player {
     }
 
     public void giveMoney(Player p, int amt) {
-        if(checkMoney(amt)) {
-            money -= amt;
-            p.money += amt;
-        }
-        else {
-            System.out.println("You cannot afford this.");
-        }
+        money -= amt;
+        p.money += amt;
     }
 
     public void setMoney(int amt) {
@@ -189,14 +210,13 @@ public class Player {
 
     public Boolean canBuyHouses() {
         Boolean openSpots = false;
-        int costCheapestHouse = 200;
+        int costCheapestHouse = 0;
         for (int i = 0; i < 8; i++) {
             //check if an owned monopoly has less than 5 houses per property
             if(monopolies.contains(i) && ((i == 0 || i == 7) && getMonopolyHouses(i) < 10) || ((i > 0 && i < 7) && getMonopolyHouses(i) < 15)) {
                 openSpots = true;
-                if(Math.ceil((i + 1)/2)*50 < costCheapestHouse) {//if monopoly's house cost is the lowest
-                    costCheapestHouse = (int)Math.ceil((i + 1)/2)*50;
-                }
+                costCheapestHouse = ((i + 2)/2)*50; //goes left to right so first found monopoly is cheapest
+                break;
             }
         }
         return openSpots && money >= costCheapestHouse; //open spots and affordable
@@ -224,18 +244,11 @@ public class Player {
         return monopolies.size();
     }
 
-    public Boolean checkMoney(int amt) {
-        if(money - amt < 0) {
-            return false;
-        }
-        return true;
-    }
-
     public void setJailed(Boolean x) {
         jailed = x;
         if(jailed) {
             position = 10;
-            jailTurns = 3;
+            jailTurns = 4;
         }
     }
 
@@ -254,7 +267,7 @@ public class Player {
     public void setPosition(int pos) {
         position = pos;
         if (position > 39) {
-            position -= 39;
+            position -= 40;
             passGo = true;
         }
     }
@@ -274,6 +287,16 @@ public class Player {
 
     public int getPropertyCount() {
         return playerProperties.size();
+    }
+
+    public int getUnmortgagedPropertyCount() {
+        int counter = 0;
+        for(int i = 0; i < playerProperties.size(); i++) {
+            if(!playerProperties.get(i).getMortgaged()) {
+                counter++;
+            }
+        }
+        return counter;
     }
 
     public int getGOOJF() {
