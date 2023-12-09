@@ -24,7 +24,7 @@ public class GameController {
         String input1 = "1";
         String input2 = "-1";
         String input3 = "-1";
-        String[]optionNames = new String[]{"Offer a trade","View/mortgage/unomortgage properties","Buy a house","Sell a house","Pay $50 to get out of jail","Use a get out of jail free card","End turn"};
+        String[]optionNames = new String[]{"Offer a trade","Manage properties","Buy a house","Sell a house","Pay $50 to get out of jail","Use a get out of jail free card","End turn"};
         /*options:
         0 - offer a trade
         1 - view/mortgage properties
@@ -200,8 +200,44 @@ public class GameController {
         String input = "-1";
         if(option == 0) { //trade
             System.out.println("trade");
+            controller.updateView();
+            ArrayList<Player> tradeOptions = new ArrayList<Player>();
+            String input1 = "-1";
+            while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > tradeOptions.size() + 1) {
+                tradeOptions.clear();
+                for(int i = 1; i < players.size(); i++) {
+                    if(players.get(i).getID() != currPlayer.getID() && (players.get(i).getUnmortgagedPropertyCount() > 0 || players.get(i).getMoney() > 0 || players.get(i).getGOOJF() > 0)) {
+                        tradeOptions.add(players.get(i));
+                    }
+                }
+                System.out.println("Offer a trade to who?");
+                for(int i = 0; i < tradeOptions.size(); i++) {
+                    System.out.println((i+1) + ". Player " + tradeOptions.get(i).getID());
+                }
+                System.out.println((tradeOptions.size() + 1) + ". Go back");
+                input1 = scan.nextLine();
+                try { //check if input is an integer, if not, just make it 0
+                    Integer.parseInt(input1);
+                } catch (NumberFormatException e) {
+                    input1 = "-1";
+                }
+            }
+
         } else if (option == 1) { //view/mortgage properties
-            System.out.println("view/mortgage/unmortgage properties");
+            System.out.println("Manage properties");
+            ArrayList<Property> orderedProperties = new ArrayList<Property>();
+            clearScreen();
+            for(int i = 0; i < 10; i++) { //cycle all monopolies
+                for(int j = 0; j < currPlayer.getPropertyCount(); j++) { //order players properties by set
+                    if (currPlayer.getProperties().get(j).getColor() == i) {
+                        orderedProperties.add(currPlayer.getProperties().get(j));
+                    }
+                }
+            }
+            for(int i = 0; i < orderedProperties.size(); i++) {
+                System.out.println((i + 1) + ". " + orderedProperties.get(i).getName());
+            }
+            scan.nextLine();
         } else if (option == 2) { //buy houses
             int j = 100;
             String[] mons = new String[]{"Purple","Light Blue","Pink","Orange","Red","Yellow","Green","Dark Blue"};

@@ -60,7 +60,7 @@ class GridController {
     public void updateView() {
         //check player positions, houses, free parking balance
         //view.displayGrid(model.getGrid(), model.getGridColors());
-        //clearScreen();
+        clearScreen();
         System.out.println("board");
     }
 

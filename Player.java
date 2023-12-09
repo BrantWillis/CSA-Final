@@ -285,6 +285,10 @@ public class Player {
         return position;
     }
 
+    public ArrayList<Property> getProperties() {
+        return playerProperties;
+    }
+
     public int getPropertyCount() {
         return playerProperties.size();
     }
