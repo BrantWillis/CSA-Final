@@ -44,7 +44,9 @@ public class Player {
                     changeRent(pos.get(i), 1 + houses.get(i)); //sets rent to doubled rent position + number of houses
                 }
             } else if (pos.size() < 3 && getRentPos(toUpdate) != 0) { //if not a monopoly but rent is larger than initial
-                monopolies.remove(playerProperties.get(pos.get(0)).getColor());
+                if(monopolies.contains(playerProperties.get(pos.get(0)).getColor())) {
+                    monopolies.remove(playerProperties.get(pos.get(0)).getColor());
+                }   
                 for(int i : pos) {
                     changeRent(i, 0);
                 }
@@ -52,7 +54,7 @@ public class Player {
         } else { //dark blue & purple properties
             if(pos.size() == 2) { //only change something if monopoly is owned
                 ArrayList<Integer> houses = getHouseCount(pos);
-                if(monopolies.indexOf(playerProperties.get(pos.get(0)).getColor()) == -1) { //if monopoly is new
+                if(!monopolies.contains(playerProperties.get(pos.get(0)).getColor())) { //if monopoly is new
                     monopolies.add(playerProperties.get(pos.get(0)).getColor());
                 }
                 for (int i = 0; i < pos.size(); i++) {
@@ -119,6 +121,16 @@ public class Player {
         updateRent(prop);
     }
 
+    public ArrayList<Integer> getAllColors() {
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+        for(int i = 0; i < playerProperties.size(); i++) {
+            if(!colors.contains(playerProperties.get(i).getColor())) {
+                colors.add(playerProperties.get(i).getColor());
+            }
+        }
+        return colors;
+    }
+
     public void addHouse(Property prop) {
         prop.setHouses(prop.getHouses() + 1);
         updateRent(prop);
@@ -156,6 +168,10 @@ public class Player {
         }
     }
 
+    public void setGOOJF(int amt) {
+        jailFree = amt;
+    }
+
     public void addHouse(int monopoly) {
         ArrayList<Integer> props = new ArrayList<Integer>();
         for(int i = 0; i < playerProperties.size(); i++) { //get an arraylist containing each property in the monopoly
@@ -165,7 +181,7 @@ public class Player {
         }
         int leastHousesPos = 10;
         int leastHouses = 10;
-        for(int i = 0; i < props.size(); i++) {
+        for(int i = props.size() - 1; i >= 0; i--) {
             if(playerProperties.get(props.get(i)).getHouses() < leastHouses) {
                 leastHouses = playerProperties.get(props.get(i)).getHouses();
                 leastHousesPos = i;

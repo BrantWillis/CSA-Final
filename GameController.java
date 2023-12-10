@@ -18,6 +18,8 @@ public class GameController {
         Scanner scan = new Scanner(System.in);
         die1 = (int)(Math.floor(Math.random() * 6) + 1);
         die2 = (int)(Math.floor(Math.random() * 6) + 1); //roll dice
+        die1 = 0;
+        die2 = 1;
 
         ArrayList<Integer> playerOptions = new ArrayList<Integer>();
         int[] options = new int[]{0,1,2,3,4,5,6};
@@ -175,7 +177,7 @@ public class GameController {
                 executePos(currPlayer, currPlayer.getPosition()); //do actions for current square
                 while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > playerOptions.size()) {
                     controller.updateView();
-                    System.out.println("Player " + currPlayer.getID() + ": $" + currPlayer.getMoney() + ", die1:" + die1 + ", die2:" + die2 + " JAILED - " + currPlayer.getJailTurns() + " turns left" + ", position:" + currPlayer.getPosition());
+                    System.out.println("Player " + currPlayer.getID() + ": $" + currPlayer.getMoney() + ", die1:" + die1 + ", die2:" + die2 + " JAILED - " + currPlayer.getJailTurns() + " turn(s) left" + ", position:" + currPlayer.getPosition());
                     for(int i = 0; i < playerOptions.size(); i++) { //display each option
                         System.out.println(i + 1 + ". " + optionNames[playerOptions.get(i)]);
                     }
@@ -225,19 +227,67 @@ public class GameController {
 
         } else if (option == 1) { //view/mortgage properties
             System.out.println("Manage properties");
+            String[] mons = new String[]{"Purple","Light Blue","Pink","Orange","Red","Yellow","Green","Dark Blue", "Public Transport", "Utilities"};
             ArrayList<Property> orderedProperties = new ArrayList<Property>();
-            clearScreen();
-            for(int i = 0; i < 10; i++) { //cycle all monopolies
-                for(int j = 0; j < currPlayer.getPropertyCount(); j++) { //order players properties by set
-                    if (currPlayer.getProperties().get(j).getColor() == i) {
-                        orderedProperties.add(currPlayer.getProperties().get(j));
+            ArrayList<Integer> allColors = currPlayer.getAllColors();
+            int e= 1;
+            
+            input = "-1";
+            while(Integer.parseInt(input) <= 0 || Integer.parseInt(input) > orderedProperties.size()) {
+                e = 1;
+                clearScreen();
+                System.out.println("Player " + currPlayer.getID() + ": $" + currPlayer.getMoney());
+                System.out.println("Select a property to mortgage or unmortgage, or press enter to go back.");
+                System.out.println("");
+                orderedProperties.clear();
+                for(int i = 0; i < 10; i++) { //cycle all monopolies
+                    if(allColors.contains(i)) {
+                        System.out.println(mons[i]);
+                    }
+                    for(int j = 0; j < currPlayer.getPropertyCount(); j++) { //order players properties by set
+                        if (currPlayer.getProperties().get(j).getColor() == i) {
+                            System.out.print("  " + e + ". " + currPlayer.getProperties().get(j).getName() + " - ");
+                            if(currPlayer.getProperties().get(j).getMortgaged()) {
+                                System.out.println("Mortgaged (unmortgage for $" + (int)((currPlayer.getProperties().get(j).getCost()/2)*((double)11/10)) + ")?");
+                            } else {
+                                if(currPlayer.getProperties().get(j).getColor() != 9) {
+                                    System.out.print("$" + currPlayer.getProperties().get(j).getCurrentRent() + " rent");
+                                } else {
+                                    System.out.print(currPlayer.getProperties().get(j).getCurrentRent() + "x roll rent");
+                                }
+                                if(currPlayer.getProperties().get(j).getHouses() > 1 && currPlayer.getProperties().get(j).getHouses() != 5) {
+                                    System.out.print(", " + currPlayer.getProperties().get(j).getHouses() + " houses");
+                                } else if (currPlayer.getProperties().get(j).getHouses() == 1) {
+                                    System.out.print(", 1 house");
+                                }else if (currPlayer.getProperties().get(j).getHouses() == 5) {
+                                    System.out.print(", 1 hotel");
+                                }
+                                System.out.println(" (mortgage for $" + (currPlayer.getProperties().get(j).getCost()/2) + "?)");
+                            }
+                            e++;
+                            orderedProperties.add(currPlayer.getProperties().get(j));
+                        }
                     }
                 }
+                input = scan.nextLine();
+                try { //check if input is an integer, if not, just make it 0
+                    Integer.parseInt(input);
+                } catch (NumberFormatException a) {
+                    return;
+                }
+                //if(Integer.parseInt(input) == 0) input = "-1";
             }
-            for(int i = 0; i < orderedProperties.size(); i++) {
-                System.out.println((i + 1) + ". " + orderedProperties.get(i).getName());
+            if(orderedProperties.get(Integer.parseInt(input) - 1).getMortgaged() && currPlayer.getMoney() >= (orderedProperties.get(Integer.parseInt(input) - 1).getCost()/2)*((double)11/10)) {
+                currPlayer.unmortgageProperty(orderedProperties.get(Integer.parseInt(input) - 1));
+                currPlayer.setMoney(currPlayer.getMoney() - (int)((orderedProperties.get(Integer.parseInt(input) - 1).getCost()/2)*((double)11/10)));
+            } else if (!orderedProperties.get(Integer.parseInt(input) - 1).getMortgaged()) {
+                currPlayer.mortgageProperty(orderedProperties.get(Integer.parseInt(input) - 1));
+                currPlayer.setMoney(currPlayer.getMoney() + (orderedProperties.get(Integer.parseInt(input) - 1).getCost()/2));
             }
-            scan.nextLine();
+            //for(int i = 0; i < orderedProperties.size(); i++) {
+                //System.out.println((i + 1) + ". " + orderedProperties.get(i).getName());
+            //}
+            //scan.nextLine();
         } else if (option == 2) { //buy houses
             int j = 100;
             String[] mons = new String[]{"Purple","Light Blue","Pink","Orange","Red","Yellow","Green","Dark Blue"};
@@ -285,7 +335,7 @@ public class GameController {
                         input = "-1";
                     }
             }
-            for (int i = 0; i < Integer.parseInt(input); i++) {
+            for (int i = Integer.parseInt(input) - 1; i >= 0 ; i--) {
                 currPlayer.addHouse(chosenMonopoly);
                 currPlayer.setMoney(currPlayer.getMoney() - (((chosenMonopoly + 2)/2)*50));
             }
@@ -336,9 +386,13 @@ public class GameController {
 
 
         } else if (option == 4) { //pay $50 GOOJ
-            System.out.println("pay 50 bucks");
+            currPlayer.setJailed(false);
+            currPlayer.setJailTurns(0);
+            currPlayer.giveMoney(players.get(0), 50);
         } else if (option == 5) { //use GOOJF
-            System.out.println("use out of jail card");
+            currPlayer.setJailed(false);
+            currPlayer.setJailTurns(0);
+            currPlayer.setGOOJF(currPlayer.getGOOJF() - 1);
         } else if (option == 6) { //end turn
             System.out.println("end turn");
             return;
@@ -394,7 +448,7 @@ public class GameController {
                     player.addProperty(prop);
                     player.setMoney(player.getMoney() - prop.getCost());
                 }
-            } else if (status != player.getID()) { //owned by other
+            } else if (status != player.getID() && status != -1 && !getByPos(pos).getMortgaged()) { //owned by other
                 controller.updateView();
                 System.out.println("Player " + player.getID() + " just landed on Player " + whoOwns(prop) + "'s " + prop.getName() + "!");
                 System.out.println("Player " + player.getID() + " paid Player " + whoOwns(prop) + "$" + (prop.getCurrentRent() * (die1 + die2)));
@@ -423,7 +477,7 @@ public class GameController {
                     player.addProperty(prop);
                     player.setMoney(player.getMoney() - prop.getCost());
                 }
-            } else if (status != player.getID()) { //owned by other
+            } else if (status != player.getID() && status != -1 && !getByPos(pos).getMortgaged()) { //owned by other
                 controller.updateView();
                 System.out.println("Player " + player.getID() + " just landed on Player " + whoOwns(prop) + "'s " + prop.getName() + "!");
                 System.out.println("Player " + player.getID() + " paid Player " + whoOwns(prop) + " $" + prop.getCurrentRent());
