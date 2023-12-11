@@ -137,7 +137,7 @@ public class Main {
         prop17.setHouses(1);
         a.setMoney(-15);*/
         //a.setJailed(true);
-        /*a.addProperty(prop1);
+        a.addProperty(prop1);
         a.addProperty(prop2);
         a.addProperty(prop3);
         a.addProperty(prop4);
@@ -147,7 +147,7 @@ public class Main {
         a.addProperty(prop8);
         a.addProperty(prop9);
         a.addProperty(prop10);
-        a.addProperty(prop21);*/
+        a.addProperty(prop21);
 
         int num = -1;
         while (num < 2 || num > 4) {

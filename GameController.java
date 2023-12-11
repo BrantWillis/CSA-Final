@@ -206,6 +206,7 @@ public class GameController {
             ArrayList<Player> tradeOptions = new ArrayList<Player>();
             String input1 = "-1";
             while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > tradeOptions.size() + 1) {
+                controller.updateView();
                 tradeOptions.clear();
                 for(int i = 1; i < players.size(); i++) {
                     if(players.get(i).getID() != currPlayer.getID() && (players.get(i).getUnmortgagedPropertyCount() > 0 || players.get(i).getMoney() > 0 || players.get(i).getGOOJF() > 0)) {
@@ -224,13 +225,19 @@ public class GameController {
                     input1 = "-1";
                 }
             }
-            int player = Integer.parseInt(input1);
+            if(Integer.parseInt(input1) == tradeOptions.size() + 1) {
+                return;
+            }
+            int player = Integer.parseInt(input1) - 1;
             input1 = "-1";
             if(currPlayer.getMoney() > 0) {
                 while(Integer.parseInt(input1) < 0 || Integer.parseInt(input1) > currPlayer.getMoney()) {
                     controller.updateView();
-                    System.out.println("How much money would you like to offer?");
+                    System.out.println("How much money would you like to offer? ($0-$" + currPlayer.getMoney() + ")");
                     input1 = scan.nextLine();
+                    if(input1.substring(0,1).equals("$")) {
+                        input1 = input1.substring(1,input1.length());
+                    }
                     try { //check if input is an integer, if not, just make it 0
                         Integer.parseInt(input1);
                     } catch (NumberFormatException e) {
@@ -241,21 +248,70 @@ public class GameController {
                 input1 = "0";
             }
             int moneyGive = Integer.parseInt(input1);
-            input1 = "-1";
             ArrayList<Integer> propertiesGive = new ArrayList<Integer>();
+            ArrayList<Property> validProperties = new ArrayList<Property>();
+            ArrayList<Property> orderedProperties = new ArrayList<Property>();
+            String[] mons = new String[]{"Purple","Light Blue","Pink","Orange","Red","Yellow","Green","Dark Blue", "Public Transport", "Utilities"};
+            ArrayList<Integer> allColors = orderedProperties.getAllColors();
             if(currPlayer.getPropertyCount() > 0) {
                 Boolean responseInvalid = true;
                 while(responseInvalid) {
+                    validProperties.clear();
+                    propertiesGive.clear();
+                    input1 = "-1";
                     controller.updateView();
                     System.out.println("Would you like to offer any properties?");
                     System.out.println("(If offering multiple properties, separate them with commas, i.e. 2,4,7)");
+                    for(int i = 0; i < currPlayer.getProperties().size(); i++) {
+                        if(currPlayer.getMonopolyHouses(currPlayer.getProperties().get(i).getColor()) == 0) {
+                            validProperties.add(currPlayer.getProperties().get(i));
+                        }
+                    }
+                    int t = 1;
+                    for(int i = 0; i < 10; i++) { //cycle all monopolies
+                        if(allColors.contains(i)) {
+                            System.out.println(mons[i]);
+                        }
+                        for(int j = 0; j < validProperties.size(); j++) { //order players properties by set
+                            if (validProperties.get(j).getColor() == i) {
+                                System.out.println("  " + t + ". " + currPlayer.getProperties().get(j).getName());
+                                /*if(orderedProperties.get(j).getMortgaged()) {
+                                    System.out.println("Mortgaged (unmortgage for $" + (int)((currPlayer.getProperties().get(j).getCost()/2)*((double)11/10)) + ")?");
+                                } else {
+                                    if(currPlayer.getProperties().get(j).getColor() != 9) {
+                                        System.out.print("$" + currPlayer.getProperties().get(j).getCurrentRent() + " rent");
+                                    } else {
+                                        System.out.print(currPlayer.getProperties().get(j).getCurrentRent() + "x roll rent");
+                                    }
+                                    if(currPlayer.getProperties().get(j).getHouses() > 1 && currPlayer.getProperties().get(j).getHouses() != 5) {
+                                        System.out.print(", " + currPlayer.getProperties().get(j).getHouses() + " houses");
+                                    } else if (currPlayer.getProperties().get(j).getHouses() == 1) {
+                                        System.out.print(", 1 house");
+                                    }else if (currPlayer.getProperties().get(j).getHouses() == 5) {
+                                        System.out.print(", 1 hotel");
+                                    }
+                                    System.out.println(" (mortgage for $" + (currPlayer.getProperties().get(j).getCost()/2) + "?)");
+                                }*/
+                                t++;
+                                orderedProperties.add(validProperties.get(j));
+                            }
+                        }
+                    }
                     input1 = scan.nextLine();
                     try { //see if there's only one number
-                        Integer.parseInt(input1);
-                        responseInvalid = false;
+                        if(Integer.parseInt(input1) > 0 && Integer.parseInt(input1) - 1 < currPlayer.getPropertyCount()) {
+                            System.out.println("response valid");scan.nextLine();
+                            responseInvalid = false;
+                        }
                     } catch (NumberFormatException e) {
+                        /*System.out.println("response might be invalid");
+                        scan.nextLine();*/
                         if(input1.contains(",")) {
+                            /*System.out.println("response contains ,");
+                            scan.nextLine();*/
                             while(input1.length() > 0) {
+                                /*System.out.println("input: " + input1);
+                                scan.nextLine();*/
                                 if(input1.indexOf(",") != -1) { //still commas left
                                     String temp = input1.substring(0, input1.indexOf(","));
                                     try {
@@ -275,32 +331,50 @@ public class GameController {
                                     input1 = "";
                                 }
                             }
+                            //responseInvalid = false;
                         } else {
                             input1 = "0";
                         }
                     }
-                    int validCount = 0;
-                    for(int i = 0; i < propertiesGive.size(); i++) { //check validity of propertiesGive
-                        if(propertiesGive.get(i) > 0 && propertiesGive.get(i) < currPlayer.getPropertyCount()) {
-                            
+                    if(propertiesGive.size() > 0) {
+                        int validCount = 0;
+                        for(int i = 0; i < propertiesGive.size(); i++) { //check validity of propertiesGive
+                            if(propertiesGive.get(i) > 0 && propertiesGive.get(i) - 1 < currPlayer.getPropertyCount() && propertiesGive.indexOf(propertiesGive.get(i)) == i) {
+                                validCount++;
+                            } else {
+                                validCount = -25;
+                            }
                         }
-                    }
-                    if(validCount == propertiesGive.size()) {
-                        responseInvalid = false;
+                        //System.out.println("validity " + validCount);scan.nextLine();
+                        if(validCount == propertiesGive.size()) {
+                            responseInvalid = false;
+                        }
                     }
                 }
             } else {
                 input1 = "0";
             }
-            /*if(Integer.parseInt(input1) != 0) {
-                if(propertiesGive.size() > 0) {
-                    for(int i = 0; i < propertiesGive.size(); i++) {
-                        currPlayer.giveProperty(currPlayer.getProperties().get(propertiesGive.get(i)), tradeOptions.get(player));
-                    }
-                } else if(Integer.parseInt(input1) ) {
-
+            for(int i = 0; i < propertiesGive.size(); i++) {
+                if(propertiesGive.get(i) - 1 >= 0 && propertiesGive.get(i) - 1 < currPlayer.getPropertyCount()) {
+                    System.out.println(currPlayer.getProperties().get(propertiesGive.get(i) - 1).getName());
                 }
-            }*/
+            }
+            scan.nextLine();
+            if(input1 == "") {
+                input1 = "-1";
+            }
+            if(Integer.parseInt(input1) != 0) {
+                if(propertiesGive.size() > 0) {
+                    while(propertiesGive.size() > 0) {
+                        currPlayer.giveProperty(currPlayer.getProperties().get(propertiesGive.get(0) - 1), tradeOptions.get(player));
+                        propertiesGive.remove(0);
+                    }
+                } else {
+                    currPlayer.giveProperty(currPlayer.getProperties().get(Integer.parseInt(input1) - 1), tradeOptions.get(player));
+                }
+            }
+            ArrayList<Integer> propertyGive = new ArrayList<Integer>();
+            
 
         } else if (option == 1) { //view/mortgage properties
             System.out.println("Manage properties");

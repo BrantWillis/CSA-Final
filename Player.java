@@ -131,7 +131,7 @@ public class Player {
 
     public void removeProperty(Property prop) { //if property is traded away (prereq has no houses)
         for (int i = 0; i < playerProperties.size(); i++) {
-            if (prop == playerProperties.get(i)) {
+            if (prop.equals(playerProperties.get(i))) {
                 playerProperties.remove(i);
             }
         }
