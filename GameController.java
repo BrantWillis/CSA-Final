@@ -224,6 +224,83 @@ public class GameController {
                     input1 = "-1";
                 }
             }
+            int player = Integer.parseInt(input1);
+            input1 = "-1";
+            if(currPlayer.getMoney() > 0) {
+                while(Integer.parseInt(input1) < 0 || Integer.parseInt(input1) > currPlayer.getMoney()) {
+                    controller.updateView();
+                    System.out.println("How much money would you like to offer?");
+                    input1 = scan.nextLine();
+                    try { //check if input is an integer, if not, just make it 0
+                        Integer.parseInt(input1);
+                    } catch (NumberFormatException e) {
+                        input1 = "-1";
+                    }
+                }
+            } else {
+                input1 = "0";
+            }
+            int moneyGive = Integer.parseInt(input1);
+            input1 = "-1";
+            ArrayList<Integer> propertiesGive = new ArrayList<Integer>();
+            if(currPlayer.getPropertyCount() > 0) {
+                Boolean responseInvalid = true;
+                while(responseInvalid) {
+                    controller.updateView();
+                    System.out.println("Would you like to offer any properties?");
+                    System.out.println("(If offering multiple properties, separate them with commas, i.e. 2,4,7)");
+                    input1 = scan.nextLine();
+                    try { //see if there's only one number
+                        Integer.parseInt(input1);
+                        responseInvalid = false;
+                    } catch (NumberFormatException e) {
+                        if(input1.contains(",")) {
+                            while(input1.length() > 0) {
+                                if(input1.indexOf(",") != -1) { //still commas left
+                                    String temp = input1.substring(0, input1.indexOf(","));
+                                    try {
+                                        Integer.parseInt(temp);
+                                    } catch (NumberFormatException u) {
+                                        temp = "-1";
+                                    }
+                                    input1 = input1.substring(input1.indexOf(",") + 1);
+                                    propertiesGive.add(Integer.parseInt(temp));
+                                } else {
+                                    try {
+                                        Integer.parseInt(input1);
+                                    } catch (NumberFormatException u) {
+                                        input1 = "-1";
+                                    }
+                                    propertiesGive.add(Integer.parseInt(input1));
+                                    input1 = "";
+                                }
+                            }
+                        } else {
+                            input1 = "0";
+                        }
+                    }
+                    int validCount = 0;
+                    for(int i = 0; i < propertiesGive.size(); i++) { //check validity of propertiesGive
+                        if(propertiesGive.get(i) > 0 && propertiesGive.get(i) < currPlayer.getPropertyCount()) {
+                            
+                        }
+                    }
+                    if(validCount == propertiesGive.size()) {
+                        responseInvalid = false;
+                    }
+                }
+            } else {
+                input1 = "0";
+            }
+            /*if(Integer.parseInt(input1) != 0) {
+                if(propertiesGive.size() > 0) {
+                    for(int i = 0; i < propertiesGive.size(); i++) {
+                        currPlayer.giveProperty(currPlayer.getProperties().get(propertiesGive.get(i)), tradeOptions.get(player));
+                    }
+                } else if(Integer.parseInt(input1) ) {
+
+                }
+            }*/
 
         } else if (option == 1) { //view/mortgage properties
             System.out.println("Manage properties");
@@ -282,7 +359,7 @@ public class GameController {
                 currPlayer.setMoney(currPlayer.getMoney() - (int)((orderedProperties.get(Integer.parseInt(input) - 1).getCost()/2)*((double)11/10)));
             } else if (!orderedProperties.get(Integer.parseInt(input) - 1).getMortgaged()) {
                 currPlayer.mortgageProperty(orderedProperties.get(Integer.parseInt(input) - 1));
-                currPlayer.setMoney(currPlayer.getMoney() + (orderedProperties.get(Integer.parseInt(input) - 1).getCost()/2));
+                currPlayer.setMoney(currPlayer.getMoney() + ((orderedProperties.get(Integer.parseInt(input) - 1).getCost())/2));
             }
             //for(int i = 0; i < orderedProperties.size(); i++) {
                 //System.out.println((i + 1) + ". " + orderedProperties.get(i).getName());

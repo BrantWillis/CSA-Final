@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Player {
     int money = 1500;
@@ -37,6 +38,9 @@ public class Player {
         } else if (toUpdate.getColor() != 0 && toUpdate.getColor() != 7) { //all 3-property monopolies
             if(pos.size() == 3) { //only change something if monopoly is owned
                 if(monopolies.indexOf(playerProperties.get(pos.get(0)).getColor()) == -1) { //if monopoly is new
+                    /*System.out.println("adding monopoly " + playerProperties.get(pos.get(0)).getColor());
+                    Scanner scan = new Scanner(System.in);
+                    scan.nextLine();*/
                     monopolies.add(playerProperties.get(pos.get(0)).getColor());
                 }
                 ArrayList<Integer> houses = getHouseCount(pos);
@@ -45,7 +49,11 @@ public class Player {
                 }
             } else if (pos.size() < 3 && getRentPos(toUpdate) != 0) { //if not a monopoly but rent is larger than initial
                 if(monopolies.contains(playerProperties.get(pos.get(0)).getColor())) {
-                    monopolies.remove(playerProperties.get(pos.get(0)).getColor());
+                    /*System.out.println("removing monopoly " + playerProperties.get(pos.get(0)).getColor());
+                    Scanner scan = new Scanner(System.in);
+                    scan.nextLine();*/
+                    //monopolies.remove(playerProperties.get(pos.get(0)).getColor());
+                    monopolies.remove(Integer.valueOf(playerProperties.get(pos.get(0)).getColor()));
                 }   
                 for(int i : pos) {
                     changeRent(i, 0);
@@ -55,13 +63,22 @@ public class Player {
             if(pos.size() == 2) { //only change something if monopoly is owned
                 ArrayList<Integer> houses = getHouseCount(pos);
                 if(!monopolies.contains(playerProperties.get(pos.get(0)).getColor())) { //if monopoly is new
+                    /*System.out.println("adding monopoly " + playerProperties.get(pos.get(0)).getColor());
+                    Scanner scan = new Scanner(System.in);
+                    scan.nextLine();*/
                     monopolies.add(playerProperties.get(pos.get(0)).getColor());
                 }
                 for (int i = 0; i < pos.size(); i++) {
                     changeRent(pos.get(i), 1 + houses.get(i)); //sets rent to doubled rent position + number of houses
                 }
             } else if (pos.size() < 2 && getRentPos(toUpdate) != 0) { //if not a monopoly but rent is larger than initial
-                monopolies.remove(playerProperties.get(pos.get(0)).getColor());
+                /*System.out.println("removing monopoly " + playerProperties.get(pos.get(0)).getColor());
+                    Scanner scan = new Scanner(System.in);
+                    scan.nextLine();*/
+                //monopolies.indexOf();
+                monopolies.remove(Integer.valueOf(playerProperties.get(pos.get(0)).getColor()));
+                //monopolies.remove(new Integer(playerProperties.get(pos.get(0)).getColor()));
+                //monopolies.remove((int)playerProperties.get(pos.get(0)).getColor());
                 for(int i : pos) {
                     changeRent(i, 0);
                 }
@@ -192,7 +209,7 @@ public class Player {
 
     public void mortgageProperty(Property prop) {
         prop.setMortgage(true);
-        money += prop.getCost() / 2;
+        //money += prop.getCost() / 2;
         updateRent(prop);
     }
 
