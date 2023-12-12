@@ -30,6 +30,21 @@ public class Player {
         U+2592	▒	Medium shade
         
         U+2593	▓	Dark shade
+
+        colors needed:
+            background - text
+            black - N/A (borders)
+            cream - black (background with black text)
+            cream - N/A (most background)
+            cream - gray (pieces)
+            cream - red (go)
+            red - white(monopoly logo + free parking amount)
+            each monopoly color - green (houses)
+            each monopoly color - dark red (hotels)
+
+            //color = "\u001B[38;5;xm"
+            //background color = "\u001B[38;5;xm"
+
      */
     //int monopolies = 0;
     Boolean passGo = false;
