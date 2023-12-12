@@ -6,6 +6,31 @@ public class Player {
     int jailFree = 0;
     int jailTurns;
     int ID;
+    int piece;
+    /* pieces
+       0 - top hat
+       1 - thimble
+       2 - shoe
+       3 - iron
+       4 - wedding ring U+014E
+       5 - cannon
+       horseshoe U+028A
+
+       house U+1260
+       hotel U+1268
+       nose U+1228
+       person U+127E
+       arrow U+1445
+       goal post U+040F
+       trident U+03A8
+       spinny wheel U+058D
+
+       U+2591	░	Light shade
+
+        U+2592	▒	Medium shade
+        
+        U+2593	▓	Dark shade
+     */
     //int monopolies = 0;
     Boolean passGo = false;
     int position = 0;
@@ -98,6 +123,12 @@ public class Player {
             }
         }
         return rentPos;
+    }
+
+    public void giveProperties(ArrayList<Property> props, Player receive) {
+        for(Property prop: props) {
+            giveProperty(prop, receive);
+        }
     }
 
     public ArrayList<Integer> getHouseCount(ArrayList<Integer> properties) {

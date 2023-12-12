@@ -126,6 +126,7 @@ public class Main {
         ArrayList<Player> players = new ArrayList<Player>();
 
         freeParking.setMoney(0);
+        a.setGOOJF(2);
         //a.setMoney(200);
         //a.setPosition(19);
         /*a.addProperty(prop1);
@@ -137,8 +138,8 @@ public class Main {
         prop17.setHouses(1);
         a.setMoney(-15);*/
         //a.setJailed(true);
-        a.addProperty(prop1);
-        a.addProperty(prop2);
+        //a.addProperty(prop1);
+        /*a.addProperty(prop2);
         a.addProperty(prop3);
         a.addProperty(prop4);
         a.addProperty(prop5);
@@ -147,7 +148,7 @@ public class Main {
         a.addProperty(prop8);
         a.addProperty(prop9);
         a.addProperty(prop10);
-        a.addProperty(prop21);
+        a.addProperty(prop21);*/
 
         int num = -1;
         while (num < 2 || num > 4) {
@@ -181,12 +182,13 @@ public class Main {
         GridController controller = new GridController(model, view);
         GameController game = new GameController(props, players, controller);
 
-        while(players.size() > 1) {
+        while(players.size() > 2) {
             for(int i = 1; i < players.size(); i++) { //skip free parking
                 game.takeTurn(players.get(i), 0);
             }
         }
         scan.close();
+        System.out.println("good game!");
 
         //controller.setCell(2, 2, 'x');
         //controller.updateView();

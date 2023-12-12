@@ -22,7 +22,9 @@ public class Property {
         this.cost = cost;
     }
 
-    public Property() {}
+    public Property() {
+        this.position = -1;
+    }
 
     private void fixName(String word) {
         String first = word.substring(0,7);
