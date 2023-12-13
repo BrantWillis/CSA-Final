@@ -1,12 +1,14 @@
 import java.util.ArrayList;
-import java.util.Scanner;
+//import java.util.Scanner;
 
 public class Player {
     int money = 1500;
     int jailFree = 0;
     int jailTurns;
     int ID;
-    int piece;
+    String name;
+    Piece piece = new Piece();
+    private Boolean lastJail = false;
     /* pieces
        0 - top hat
        1 - thimble
@@ -33,12 +35,54 @@ public class Player {
 
         colors needed:
             background - text
-            black - N/A (borders)
-            cream - black (background with black text)
-            cream - N/A (most background)
-            cream - gray (pieces)
-            cream - red (go)
-            red - white(monopoly logo + free parking amount)
+            a black - black (borders)  16 - 16
+            b cream - black (background with black text) 255 - 16
+            c cream - gray (pieces) 255 - 244
+            d cream - red (go) 255 - 196
+            e red - white(monopoly logo) 196 - 15
+            f purple - green 5 - 34
+            g light blue - green 51 - 34
+            h pink - green 201 - 34
+            i orange - green 202 - 34
+            j red - green 196 - 34
+            k yellow - green 226 - 34
+            l green - green 22 - 34
+            m dark blue - green 4 - 34
+            n purple - dark red 5 - 88
+            o light blue - dark red 51 - 88
+            p pink - dark red 201 - 88
+            q orange - dark red 202 - 88
+            r red - dark red 196 - 88
+            s yellow - dark red 226 - 88
+            t green - dark red 22 - 88
+            u dark blue - dark red 4 - 88
+            v orange - black 202 - 16
+            w light gray - black 248 - 16
+            'a' = "\u001B[48;5;16;38;5;16m"
+            'b' = "\u001B[48;5;255;38;5;16m"
+            'c' = "\u001B[48;5;255;38;5;244m"
+            'd' = "\u001B[48;5;255;38;5;196m"
+            'e' = "\u001B[48;5;196;38;5;15m"
+            'f' = "\u001B[48;5;5;38;5;34m"
+            'g' = "\u001B[48;5;51;38;5;34m"
+            'h' = "\u001B[48;5;201;38;5;34m"
+            'i' = "\u001B[48;5;202;38;5;34m"
+            'j' = "\u001B[48;5;196;38;5;34m"
+            'k' = "\u001B[48;5;226;38;5;34m"
+            'l' = "\u001B[48;5;22;38;5;34m"
+            'm' = "\u001B[48;5;4;38;5;34m"
+            'n' = "\u001B[48;5;5;38;5;88m"
+            'o' = "\u001B[48;5;51;38;5;88m"
+            'p' = "\u001B[48;5;201;38;5;88m"
+            'q' = "\u001B[48;5;202;38;5;88m"
+            'r' = "\u001B[48;5;196;38;5;88m"
+            's' = "\u001B[48;5;226;38;5;88m"
+            't' = "\u001B[48;5;22;38;5;88m"
+            'u' = "\u001B[48;5;4;38;5;88m"
+            'v' = "\u001B[48;5;202;38;5;16m"
+            'w' = "\u001B[48;5;248;38;5;16m"
+
+
             each monopoly color - green (houses)
             each monopoly color - dark red (hotels)
 
@@ -52,10 +96,19 @@ public class Player {
     Boolean jailed = false;
     ArrayList<Integer> monopolies = new ArrayList<Integer>();
     ArrayList<Property> playerProperties;
+    private int lastPos = 0;
 
     public Player(ArrayList<Property> properties, int ID) {
         this.playerProperties = properties;
         this.ID = ID;
+    }
+
+    public void addPiece(Piece p) {
+        piece = p;
+    }
+
+    public int getLastPos() {
+        return lastPos;
     }
 
     //called when a person buys a house, sells a house, buys a property, or mortgages/sells a property
@@ -140,10 +193,22 @@ public class Player {
         return rentPos;
     }
 
+    public Piece getPiece() {
+        return piece;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public void giveProperties(ArrayList<Property> props, Player receive) {
         for(Property prop: props) {
             giveProperty(prop, receive);
         }
+    }
+
+    public String getName() {
+        return name;
     }
 
     public ArrayList<Integer> getHouseCount(ArrayList<Integer> properties) {
@@ -343,7 +408,13 @@ public class Player {
         return jailed;
     }
 
+    public Boolean getLastJail() {
+        return lastJail;
+    }
+
     public void setPosition(int pos) {
+        lastPos = position;
+        lastJail = jailed;
         position = pos;
         if (position > 39) {
             position -= 40;

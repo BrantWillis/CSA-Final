@@ -18,15 +18,15 @@ public class GameController {
         Scanner scan = new Scanner(System.in);
         die1 = (int)(Math.floor(Math.random() * 6) + 1);
         die2 = (int)(Math.floor(Math.random() * 6) + 1); //roll dice
-        die1 = 0;
-        die2 = 1;
+        //die1 = 0;
+        //die2 = 1;
 
         ArrayList<Integer> playerOptions = new ArrayList<Integer>();
         int[] options = new int[]{0,1,2,3,4,5,6};
         String input1 = "1";
         String input2 = "-1";
         String input3 = "-1";
-        String[]optionNames = new String[]{"Offer a trade","Buy current property", "Manage properties","Buy a house","Sell a house","Pay $50 to get out of jail","Use a get out of jail free card","End turn"};
+        String[]optionNames = new String[]{"Offer a trade","Buy current property", "Manage properties","Buy houses","Sell a house","Pay $50 to get out of jail","Use a get out of jail free card","End turn"};
         /*options:
         0 - offer a trade
         1 - buy current property
@@ -43,6 +43,9 @@ public class GameController {
             repeat = true;
             doublesCount++;
         }
+        controller.updateView();
+        System.out.println(currPlayer.getName() + " rolled a(n) " + die1 + " and a(n) " + die2 + ". Press enter to continue");
+        scan.nextLine();
         if (doublesCount == 3) { //third doubles
             currPlayer.setJailed(true);
             doublesCount = 0;
@@ -60,7 +63,7 @@ public class GameController {
             playerOptions.add(0);
         }
         if(getByPos(currPlayer.getPosition()).getPosition() != -1 && currPlayer.getMoney() >= getByPos(currPlayer.getPosition()).getCost() && whoOwns(getByPos(currPlayer.getPosition())) == -1) {
-            optionNames[1] = "Buy " + getByPos(currPlayer.getPosition()).getName();
+            optionNames[1] = "Buy " + getByPos(currPlayer.getPosition()).getName() + " ($" + getByPos(currPlayer.getPosition()).getCost() + ")";
             playerOptions.add(1);
         }
         if(currPlayer.getPropertyCount() > 0) {
@@ -87,124 +90,86 @@ public class GameController {
             players.remove(currPlayer);
             return;
         }
-        if(!currPlayer.getJailed()) { //if player is in normal state
+        
+        
+        //stuff
+        if(!currPlayer.getJailed()) {
             currPlayer.setPosition(currPlayer.getPosition() + die1 + die2);
 
             if(currPlayer.getGo()) { //check if passed go
                 currPlayer.setGo(false);
                 currPlayer.setMoney(currPlayer.getMoney() + 200);
-            }
-            controller.updateView();
-            executePos(currPlayer, currPlayer.getPosition()); //do actions for current square
-            while(playerOptions.get(Integer.parseInt(input1) - 1) != 7) { //give options until player ends turn
-                input1 = "-1";
-                playerOptions.clear();
-                if(currPlayer.getUnmortgagedPropertyCount() > 0 || currPlayer.getMoney() > 0 || currPlayer.getGOOJF() > 0) { //can trade if has some stuff
-                    playerOptions.add(0);
-                }
-                if(getByPos(currPlayer.getPosition()).getPosition() != -1 && currPlayer.getMoney() >= getByPos(currPlayer.getPosition()).getCost() && whoOwns(getByPos(currPlayer.getPosition())) == -1) {
-                    optionNames[1] = "Buy " + getByPos(currPlayer.getPosition()).getName();
-                    playerOptions.add(1);
-                    //System.out.println("added");scan.nextLine();
-                }
-                if(currPlayer.getPropertyCount() > 0) {
-                    playerOptions.add(2);
-                }
-                if(currPlayer.getMonopolies() > 0 && currPlayer.canBuyHouses()) {
-                    playerOptions.add(3);
-                }
-                if(currPlayer.getTotalHouses() > 0) {
-                    playerOptions.add(4);
-                }
-                if(currPlayer.getJailed()) {
-                    if(currPlayer.getMoney() >= 50) {
-                        playerOptions.add(5);
-                    }
-                    if(currPlayer.getGOOJF() > 0) {
-                        playerOptions.add(6);
-                    }
-                }
-                if(currPlayer.getMoney() >= 0) { //if not in debt can end turn
-                    playerOptions.add(7);
-                }
-                if(playerOptions.size() == 0) {
-                    players.remove(currPlayer);
-                    return;
-                }
-                while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > playerOptions.size()) {
-                    controller.updateView();
-                    System.out.println("Player " + currPlayer.getID() + ": $" + currPlayer.getMoney() + ", die1:" + die1 + ", die2:" + die2 + ", position:" + currPlayer.getPosition());
-                    for(int i = 0; i < playerOptions.size(); i++) { //display each option
-                        System.out.println(i + 1 + ". " + optionNames[playerOptions.get(i)]);
-                    }
-                    input1= scan.nextLine();
-                    try { //check if input is an integer, if not, just make it 0
-                        Integer.parseInt(input1);
-                    } catch (NumberFormatException e) {
-                        input1 = "-1";
-                    }
-                    /*if(input1 == null || input1 == "") {//if player just presses enter
-                        input1 = "0";
-                    }*/
-                }
-                executeOptions(playerOptions.get(Integer.parseInt(input1) - 1), currPlayer);
-            }
-            
-
-        } else { //if player is jailed
-            while(playerOptions.get(Integer.parseInt(input1) - 1) != 7) { //give options until player ends turn
-                input1 = "-1";
-                playerOptions.clear();
-                if(currPlayer.getUnmortgagedPropertyCount() > 0 || currPlayer.getMoney() > 0 || currPlayer.getGOOJF() > 0) { //can trade if has some stuff
-                    playerOptions.add(0);
-                }
-                if(getByPos(currPlayer.getPosition()).getPosition() != -1 && currPlayer.getMoney() >= getByPos(currPlayer.getPosition()).getCost() && whoOwns(getByPos(currPlayer.getPosition())) == -1) {
-                    //optionNames[1] = "Buy " + getByPos(currPlayer.getPosition()).getName();
-                    playerOptions.add(1);
-                }
-                if(currPlayer.getPropertyCount() > 0) {
-                    playerOptions.add(2);
-                }
-                if(currPlayer.getMonopolies() > 0 && currPlayer.canBuyHouses()) {
-                    playerOptions.add(3);
-                }
-                if(currPlayer.getTotalHouses() > 0) {
-                    playerOptions.add(4);
-                }
-                if(currPlayer.getJailed()) {
-                    if(currPlayer.getMoney() >= 50) {
-                        playerOptions.add(5);
-                    }
-                    if(currPlayer.getGOOJF() > 0) {
-                        playerOptions.add(6);
-                    }
-                }
-                if(currPlayer.getMoney() >= 0) { //if not in debt can end turn
-                    playerOptions.add(7);
-                }
-                if(playerOptions.size() == 0) {
-                    players.remove(currPlayer);
-                    return;
-                }
-                currPlayer.setPosition(10); //jail position
                 controller.updateView();
-                executePos(currPlayer, currPlayer.getPosition()); //do actions for current square
-                while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > playerOptions.size()) {
-                    controller.updateView();
-                    System.out.println("Player " + currPlayer.getID() + ": $" + currPlayer.getMoney() + ", die1:" + die1 + ", die2:" + die2 + " JAILED - " + currPlayer.getJailTurns() + " turn(s) left" + ", position:" + currPlayer.getPosition());
-                    for(int i = 0; i < playerOptions.size(); i++) { //display each option
-                        System.out.println(i + 1 + ". " + optionNames[playerOptions.get(i)]);
-                    }
-                    input1= scan.nextLine();
-                    try { //check if input is an integer, if not, just make it 0
-                            Integer.parseInt(input1);
-                        } catch (NumberFormatException e) {
-                            input1 = "-1";
-                        }
+                if (currPlayer.getPosition() != 0) {
+                    System.out.print(currPlayer.getName() + " got $200 for passing Go!");
+                } else {
+                    System.out.print(currPlayer.getName() + " got $500 for lading on Go!");
                 }
-                executeOptions(playerOptions.get(Integer.parseInt(input1) - 1), currPlayer);
+                System.out.println(" Press enter to continue.");
+                scan.nextLine();
             }
-            //System.out.println("JAIL");
+        } else {
+            currPlayer.setPosition(10);
+        }
+        controller.updateView();
+        executePos(currPlayer, currPlayer.getPosition(), false, false); //do actions for current square
+        while(playerOptions.get(Integer.parseInt(input1) - 1) != 7) { //give options until player ends turn
+            input1 = "-1";
+            playerOptions.clear();
+            if(currPlayer.getUnmortgagedPropertyCount() > 0 || currPlayer.getMoney() > 0 || currPlayer.getGOOJF() > 0) { //can trade if has some stuff
+                playerOptions.add(0);
+            }
+            if(getByPos(currPlayer.getPosition()).getPosition() != -1 && currPlayer.getMoney() >= getByPos(currPlayer.getPosition()).getCost() && whoOwns(getByPos(currPlayer.getPosition())) == -1) {
+                optionNames[1] = "Buy " + getByPos(currPlayer.getPosition()).getName() + " ($" + getByPos(currPlayer.getPosition()).getCost() + ")";
+                playerOptions.add(1);
+                //System.out.println("added");scan.nextLine();
+            }
+            if(currPlayer.getPropertyCount() > 0) {
+                playerOptions.add(2);
+            }
+            if(currPlayer.getMonopolies() > 0 && currPlayer.canBuyHouses()) {
+                playerOptions.add(3);
+            }
+            if(currPlayer.getTotalHouses() > 0) {
+                playerOptions.add(4);
+            }
+            if(currPlayer.getJailed()) {
+                if(currPlayer.getMoney() >= 50) {
+                    playerOptions.add(5);
+                }
+                if(currPlayer.getGOOJF() > 0) {
+                    playerOptions.add(6);
+                }
+            }
+            if(currPlayer.getMoney() >= 0) { //if not in debt can end turn
+                playerOptions.add(7);
+            }
+            if(playerOptions.size() == 0) {
+                players.remove(currPlayer);
+                return;
+            }
+            while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > playerOptions.size()) {
+                controller.updateView();
+                System.out.print(currPlayer.getName() + " (" + currPlayer.getPiece().getName() + ")" + ": $" + currPlayer.getMoney());/*  die1:" + die1 + ", die2:" + die2 + ", position:" + currPlayer.getPosition());*/
+                if(currPlayer.getJailed()) {
+                    System.out.println(" - JAILED - " + currPlayer.getJailTurns() + " turn(s) left");
+                } else {
+                    System.out.println();
+                }
+                for(int i = 0; i < playerOptions.size(); i++) { //display each option
+                    System.out.println(i + 1 + ". " + optionNames[playerOptions.get(i)]);
+                }
+                input1= scan.nextLine();
+                try { //check if input is an integer, if not, just make it 0
+                    Integer.parseInt(input1);
+                } catch (NumberFormatException e) {
+                    input1 = "-1";
+                }
+                /*if(input1 == null || input1 == "") {//if player just presses enter
+                    input1 = "0";
+                }*/
+            }
+            executeOptions(playerOptions.get(Integer.parseInt(input1) - 1), currPlayer);
         }
         if(repeat) {
             takeTurn(currPlayer, doublesCount);
@@ -217,11 +182,11 @@ public class GameController {
         if(option == 0) { //trade
         
             System.out.println("trade");
-            /*controller.updateView();*/clearScreen();
+            /*controller.updateView();*/controller.updateView();
             ArrayList<Player> tradeOptions = new ArrayList<Player>();
             String input1 = "-1";
             while(Integer.parseInt(input1) < 1 || Integer.parseInt(input1) > tradeOptions.size() + 1) {
-                /*controller.updateView();*/clearScreen();
+                /*controller.updateView();*/controller.updateView();
                 tradeOptions.clear();
                 for(int i = 1; i < players.size(); i++) {
                     if(players.get(i).getID() != currPlayer.getID() && (players.get(i).getUnmortgagedPropertyCount() > 0 || players.get(i).getMoney() > 0 || players.get(i).getGOOJF() > 0)) {
@@ -230,7 +195,7 @@ public class GameController {
                 }
                 System.out.println("Offer a trade to who?");
                 for(int i = 0; i < tradeOptions.size(); i++) {
-                    System.out.println((i+1) + ". Player " + tradeOptions.get(i).getID());
+                    System.out.println((i+1) + ". " + tradeOptions.get(i).getName());
                 }
                 System.out.println((tradeOptions.size() + 1) + ". Go back");
                 input1 = scan.nextLine();
@@ -247,7 +212,7 @@ public class GameController {
             input1 = "-1";
             if(currPlayer.getMoney() > 0) {
                 while(Integer.parseInt(input1) < 0 || Integer.parseInt(input1) > currPlayer.getMoney()) {
-                    /*controller.updateView();*/clearScreen();
+                    /*controller.updateView();*/controller.updateView();
                     System.out.println("How much money would you like to offer? (you have $" + currPlayer.getMoney() + ")");
                     input1 = scan.nextLine();
                     if(input1 == "") {
@@ -278,7 +243,7 @@ public class GameController {
                     validProperties.clear();
                     propertiesGive.clear();
                     input1 = "-1";
-                    /*controller.updateView();*/clearScreen();
+                    /*controller.updateView();*/controller.updateView();
                     System.out.println("Would you like to offer any properties? If not, just press enter.");
                     System.out.println("(If offering multiple properties, separate them with commas, i.e. 2,4,7)");
                     for(int i = 0; i < currPlayer.getProperties().size(); i++) {
@@ -402,7 +367,7 @@ public class GameController {
             input1 = "-1";
             if(currPlayer.getGOOJF() > 0) {
                 while(Integer.parseInt(input1) < 0 || Integer.parseInt(input1) > currPlayer.getGOOJF()) {
-                    /*controller.updateView();*/clearScreen();
+                    /*controller.updateView();*/controller.updateView();
                     System.out.println("You have " + currPlayer.getGOOJF() + " Get Out of Miege Free card(s). How many would you like to offer?");
                     input1 = scan.nextLine();
                     try {
@@ -419,8 +384,8 @@ public class GameController {
             Player other = tradeOptions.get(player);
             if(other.getMoney() > 0) {
                 while(Integer.parseInt(input1) < 0 || Integer.parseInt(input1) > other.getMoney()) {
-                    /*controller.updateView();*/clearScreen();
-                    System.out.println("How much money would you like to request? (Player " + other.getID() + " has $" + other.getMoney() + ")");
+                    /*controller.updateView();*/controller.updateView();
+                    System.out.println("How much money would you like to request? (" + other.getName() + " has $" + other.getMoney() + ")");
                     input1 = scan.nextLine();
                     if(input1 == "") {
                         input1 = "-1";
@@ -450,7 +415,7 @@ public class GameController {
                     validPropertiesOther.clear();
                     propertiesRequest.clear();
                     input1 = "-1";
-                    /*controller.updateView();*/clearScreen();
+                    /*controller.updateView();*/controller.updateView();
                     System.out.println("Would you like to request any properties? If not, just press enter.");
                     System.out.println("(If requesting multiple properties, separate them with commas, i.e. 2,4,7)");
                     for(int i = 0; i < other.getProperties().size(); i++) {
@@ -574,8 +539,8 @@ public class GameController {
             input1 = "-1";
             if(other.getGOOJF() > 0) {
                 while(Integer.parseInt(input1) < 0 || Integer.parseInt(input1) > currPlayer.getGOOJF()) {
-                    /*controller.updateView();*/clearScreen();
-                    System.out.println("Player " + other.getID() + " has " + other.getGOOJF() + " Get Out of Miege Free card(s). How many would you like to request?");
+                    /*controller.updateView();*/controller.updateView();
+                    System.out.println(other.getName() + " has " + other.getGOOJF() + " Get Out of Miege Free card(s). How many would you like to request?");
                     input1 = scan.nextLine();
                     try {
                         Integer.parseInt(input1);
@@ -615,8 +580,8 @@ public class GameController {
             Boolean thisAgree = false;
             Boolean otherAgree = false;
             while(Integer.parseInt(input1) != 1 && Integer.parseInt(input1) != 2) {
-                /*controller.updateView();*/clearScreen();
-                System.out.println("Player " + currPlayer.getID() + ", how does this look?");
+                /*controller.updateView();*/controller.updateView();
+                System.out.println(currPlayer.getName() + ", how does this look?");
                 System.out.println("You give:");
                 if(moneyGive > 0) {
                     System.out.println("  $" + moneyGive);
@@ -655,8 +620,8 @@ public class GameController {
             input1 = "-1";
             if(thisAgree) {
                 while(Integer.parseInt(input1) != 1 && Integer.parseInt(input1) != 2) {
-                    /*controller.updateView();*/clearScreen();
-                    System.out.println("Player " + other.getID() + ", how does this look?");
+                    /*controller.updateView();*/controller.updateView();
+                    System.out.println(other.getName() + ", how does this look?");
                     System.out.println("You give:");
                     if(moneyRequest > 0) {
                         System.out.println("  $" + moneyRequest);
@@ -722,8 +687,8 @@ public class GameController {
             input = "-1";
             while(Integer.parseInt(input) <= 0 || Integer.parseInt(input) > orderedProperties.size()) {
                 e = 1;
-                clearScreen();
-                System.out.println("Player " + currPlayer.getID() + ": $" + currPlayer.getMoney());
+                controller.updateView();
+                System.out.println(currPlayer.getName() + ": $" + currPlayer.getMoney());
                 System.out.println("Select a property to mortgage or unmortgage, or press enter to go back.");
                 System.out.println("");
                 orderedProperties.clear();
@@ -813,7 +778,7 @@ public class GameController {
             maxAfford /= (chosenMonopoly + 2)/2;
             while (Integer.parseInt(input) < 0 || Integer.parseInt(input) > maxAfford) {
                 controller.updateView();
-                System.out.println("Player " + currPlayer.getID() + " ($" + currPlayer.getMoney() + ") buying for " + mons[chosenMonopoly] + " monopoly:");
+                System.out.println(currPlayer.getName() + " ($" + currPlayer.getMoney() + ") buying for " + mons[chosenMonopoly] + " monopoly:");
                 System.out.println("How many houses would you like to buy? It will cost $" + ((chosenMonopoly + 2)/2)*50 + " for each house bought.");
                 input = scan.nextLine();
                 try { //check if input is an integer, if not, just make it 0
@@ -858,7 +823,7 @@ public class GameController {
             input = "-1";
             while (Integer.parseInt(input) < 0 || Integer.parseInt(input) > currPlayer.getMonopolyHouses(chosenMonopoly)) {
                 controller.updateView();
-                System.out.println("Player " + currPlayer.getID() + " selling from " + mons[chosenMonopoly] + " monopoly:");
+                System.out.println(currPlayer.getName() + " selling from " + mons[chosenMonopoly] + " monopoly:");
                 System.out.println("How many houses would you like to sell? You will earn $" + ((chosenMonopoly + 2)/2)*25 + " for each house sold.");
                 input = scan.nextLine();
                 try { //check if input is an integer, if not, just make it 0
@@ -886,42 +851,43 @@ public class GameController {
         }
     }
 
-    public void executePos(Player player, int pos) {
+    public void executePos(Player player, int pos, Boolean doubleRent, Boolean card) {
         String input = "-1";
         Scanner scan = new Scanner(System.in);
         if ((pos == 4 || pos == 38)) { //tax
             Vector<String> taxes = new Vector<String>();
             taxes.add("Property Tax");taxes.add("Chiefs Tickets");
             controller.updateView();
-            System.out.println("Player " + player.getID() + " landed on " + taxes.get((-4+pos)/34) + ", costing $" + (7300 - (pos*125))/34);
+            System.out.println(player.getName() + " landed on " + taxes.get((-4+pos)/34) + ", costing $" + (7300 - (pos*125))/34);
             System.out.println("Press enter to continue.");
             scan.nextLine();
             player.giveMoney(players.get(0), (7300 - (pos*125))/34);
-        } else if (pos == 20) { //free parking
+        } else if (pos == 20 && players.get(0).getMoney() > 0) { //free parking
             controller.updateView();
-            System.out.println("Player " + player.getID() + " found free parking downtown on a Saturday!");
+            System.out.println(player.getName() + " found free parking downtown on a Saturday!");
             System.out.println("Go out and splurge with those newfound $" + players.get(0).getMoney() + ".");
             System.out.println("Press enter to continue.");
             scan.nextLine();
             players.get(0).giveMoney(player, players.get(0).getMoney());
-        } else if (pos == 2 || pos == 17 || pos == 33) {
-            Chest(player);
-        } else if (pos == 7 || pos == 22 || pos == 36) {
+        } else if (pos == 2 || pos == 17 || pos == 33 || pos == 7 || pos == 22 || pos == 36) {
+            ChestOrChance(player);
+        } /*else if (pos == 7 || pos == 22 || pos == 36) {
             Chance(player);
-        } else if (pos == 0) { //regular go money plus 300
+        } */else if (pos == 0 && !card) { //regular go money plus 300
             player.setMoney(player.getMoney() + 300);
         } else if (pos == 30) { //go to miege
             controller.updateView();
-            System.out.println("Player " + player.getID() + " has been sent to Miege! How disappointing.");
+            System.out.println(player.getName() + " has been sent to Miege... Press enter to continue.");
             player.setJailed(true);
+            scan.nextLine();
         } else if (pos == 12 || pos == 28) { //utilities
             System.out.println(getByPos(pos).getName());
             Property prop = getByPos(pos);
             int status = whoOwns(prop);
-            if (status == -1 && player.getMoney() >= prop.getCost()) { // unowned & can afford
+            /*if (status == -1 && player.getMoney() >= prop.getCost()) { // unowned & can afford
                 while (Integer.parseInt(input) < 1 || Integer.parseInt(input) > 2) {
                     controller.updateView();
-                    System.out.println("Player " + player.getID() + " just landed on " + prop.getName() + " ($" + prop.getCost() + ")! Buy it?");
+                    System.out.println(player.getName() + " just landed on " + prop.getName() + " ($" + prop.getCost() + ")! Buy it?");
                     System.out.println("1. Yes");
                     System.out.println("2. No");
                     input = scan.nextLine();
@@ -935,22 +901,29 @@ public class GameController {
                     player.addProperty(prop);
                     player.setMoney(player.getMoney() - prop.getCost());
                 }
-            } else if (status != player.getID() && status != -1 && !getByPos(pos).getMortgaged()) { //owned by other
+            } else */if (status != player.getID() && status != -1 && !getByPos(pos).getMortgaged() && !doubleRent) { //owned by other
                 controller.updateView();
-                System.out.println("Player " + player.getID() + " just landed on Player " + whoOwns(prop) + "'s " + prop.getName() + "!");
-                System.out.println("Player " + player.getID() + " paid Player " + whoOwns(prop) + "$" + (prop.getCurrentRent() * (die1 + die2)));
+                System.out.println(player.getName() + " just landed on " + players.get(whoOwns(prop)).getName() + "'s " + prop.getName() + "!");
+                System.out.println(player.getName() + " paid " + players.get(whoOwns(prop)).getName() + " $" + (prop.getCurrentRent() * (die1 + die2)));
                 System.out.println("Press enter to continue.");
                 scan.nextLine();
                 player.giveMoney(players.get(whoOwns(prop)),(prop.getCurrentRent() * (die1 + die2)));
+            } else if(status != player.getID() && status != -1 && !getByPos(pos).getMortgaged() && doubleRent) {
+                controller.updateView();
+                System.out.println(player.getName() + " just landed on " + players.get(whoOwns(prop)).getName() + "'s " + prop.getName() + "!");
+                System.out.println(player.getName() + " paid " + players.get(whoOwns(prop)).getName() + " $" + (10 * (die1 + die2)));
+                System.out.println("Press enter to continue.");
+                scan.nextLine();
+                player.giveMoney(players.get(whoOwns(prop)),(10 * (die1 + die2)));
             }
         } else if (pos != 10) { //all properties (excluding just visiting)
             System.out.println(getByPos(pos).getName());
             Property prop = getByPos(pos);
             int status = whoOwns(prop);
-            if (status == -1 && player.getMoney() >= prop.getCost()) { // unowned & can afford
+            /*if (status == -1 && player.getMoney() >= prop.getCost()) { // unowned & can afford
                 while (Integer.parseInt(input) < 1 || Integer.parseInt(input) > 2) {
                     controller.updateView();
-                    System.out.println("Player " + player.getID() + " just landed on " + prop.getName() + " ($" + prop.getCost() + ")! Buy it?");
+                    System.out.println(player.getName() + " just landed on " + prop.getName() + " ($" + prop.getCost() + ")! Buy it?");
                     System.out.println("1. Yes");
                     System.out.println("2. No");
                     input = scan.nextLine();
@@ -964,13 +937,21 @@ public class GameController {
                     player.addProperty(prop);
                     player.setMoney(player.getMoney() - prop.getCost());
                 }
-            } else if (status != player.getID() && status != -1 && !getByPos(pos).getMortgaged()) { //owned by other
+            } else */if (status != player.getID() && status != -1 && !getByPos(pos).getMortgaged()) { //owned by other
                 controller.updateView();
-                System.out.println("Player " + player.getID() + " just landed on Player " + whoOwns(prop) + "'s " + prop.getName() + "!");
-                System.out.println("Player " + player.getID() + " paid Player " + whoOwns(prop) + " $" + prop.getCurrentRent());
-                System.out.println("Press enter to continue.");
-                scan.nextLine();
-                player.giveMoney(players.get(whoOwns(prop)),prop.getCurrentRent());
+                if(!doubleRent) {
+                    System.out.println(player.getName() + " just landed on " + players.get(whoOwns(prop)).getName() + "'s " + prop.getName() + "!");
+                    System.out.println(player.getName() + " paid " + players.get(whoOwns(prop)).getName() + " $" + prop.getCurrentRent());
+                    System.out.println("Press enter to continue.");
+                    scan.nextLine();
+                    player.giveMoney(players.get(whoOwns(prop)),prop.getCurrentRent());
+                } else {
+                    System.out.println(player.getName() + " just landed on " + players.get(whoOwns(prop)).getName() + "'s " + prop.getName() + "!");
+                    System.out.println(player.getName() + " paid " + players.get(whoOwns(prop)).getName() + " $" + prop.getCurrentRent() * 2);
+                    System.out.println("Press enter to continue.");
+                    scan.nextLine();
+                    player.giveMoney(players.get(whoOwns(prop)),prop.getCurrentRent() * 2);
+                }
             }
         }
     }
@@ -997,13 +978,118 @@ public class GameController {
         return pl;
     }
 
-    public void Chest(Player p) {
+    public void ChestOrChance(Player p) {
+        Scanner scan = new Scanner(System.in);
+        int card = (int)(Math.floor(Math.random() * 16));
+        Card chosen;
+        int pose = p.getPosition();
+        if(pose == 2 || pose == 17 || pose == 33) {
+            chosen = chests.get(card);
+        } else  {
+            chosen = chances.get(card);
+        }
+        controller.updateView();
+        //System.out.println(p.getName() + " - $" + p.getMoney());
+        if(chosen.getCoc() == 0) {
+            System.out.print("Community Chest - ");
+        } else {
+            System.out.print("Chance - ");
+        }
+        System.out.println(chosen.getName());
+        System.out.println(chosen.getDescription());
+        System.out.println("Press enter to continue.");
+        scan.nextLine();
+        switch(chosen.getType()) {
+            case 0: //gain money
+                p.setMoney(p.getMoney() + chosen.getAmc());
+                break;
+            case 1: //go to jail
+                p.setPosition(10);
+                p.setJailed(true);
+                break;
+            case 2: //goojf
+                p.setGOOJF(p.getGOOJF() + 1);
+                break;
+            case 3: //go to spot
+                if(p.getPosition() < chosen.getAmc()) {
+                    p.setPosition(chosen.getAmc());
+                } else { //if they would pass go
+                    p.setPosition(chosen.getAmc() + 40);
+                }
+                executePos(p, p.getPosition(), false, true);
+                //p.setPosition(chosen.getAmc());
+                break;
+            case 4: //go to certain color property
+                int pos = p.getPosition();
+                for(int i = p.getPosition(); i < 41; i++) {
+                    if(i == 40) i = 0;
+                    if(getByPos(i).getColor() == chosen.getAmc()) {
+                        pos = i;
+                        break;
+                    }
+                }
+                if(p.getPosition() < pos) {
+                    p.setPosition(pos);
+                } else {
+                    p.setPosition(pos + 40);
+                }
+                executePos(p, p.getPosition(), true, false);
+                break;
+            case 5://back 3 spaces
+                p.setPosition(p.getPosition() - 3);
+                executePos(p, p.getPosition(), false, false);
+                break;
+            case 6: //pay money
+                p.giveMoney(players.get(0), chosen.getAmc());
+                break;
+            case 7://pay each 50
+                for(int i = 1; i < players.size(); i++) {
+                    if(players.get(i).getID() != p.getID()) {
+                        p.giveMoney(players.get(i), 50);
+                    }
+                }
+                break;
+            case 8://receive 50 from each
+                for(int i = 1; i < players.size(); i++) {
+                    if(players.get(i).getID() != p.getID()) {
+                        players.get(i).giveMoney(p, 50);
+                    }
+                }
+                break;
+            case 9://street repairs (25/100 if chance, 40/115 if chest)
+                int totalGiven = 0;
+                for(int i = 0; i < p.getPropertyCount(); i++) {
+                    if(p.getProperties().get(i).getHouses() == 5) { //property has hotel
+                        if(chosen.getCoc() == 0) { //115 if chest
+                            p.giveMoney(players.get(0), 115);
+                            totalGiven += 115;
+                        } else {
+                            p.giveMoney(players.get(0), 100);
+                        }
+                    } else {
+                        if(chosen.getCoc() == 0) { //115 if chest
+                            p.giveMoney(players.get(0), p.getProperties().get(i).getHouses()*40);
+                            totalGiven += p.getProperties().get(i).getHouses()*40;
+                        } else {
+                            p.giveMoney(players.get(0), p.getProperties().get(i).getHouses()*25);
+                            totalGiven += p.getProperties().get(i).getHouses()*25;
+                        }
+                    }
+                }
+                controller.updateView();
+                System.out.println("You gave $" + totalGiven + "! Press enter to continue");
+                scan.nextLine();
+                break;
+            default:
+                break;
+        }
 
     }
 
-    public void Chance(Player p) {
-
-    }
+    /*public void Chance(Player p) {
+        int card = (int)(Math.floor(Math.random() * 16));
+        Card chosen = chests.get(card);
+    }*/
 
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");  
@@ -1026,7 +1112,7 @@ public class GameController {
 
     Card cc1 = new Card(0,"Go to Miege", "You got expelled from Rockhurst.\nGo to Miege.\nDo not pass Go.\nDo not collect $200.", 1, -1);
     Card cc2 = new Card(0,"Advance to Go", "Collect $200!", 3, 0);
-    Card cc3 = new Card(0,"Get Out of Miege Free", "This card may be kept (in case of Rockhurst expulsion) or traded.", 1, -1);
+    Card cc3 = new Card(0,"Get Out of Miege Free", "This card may be kept (in case of Rockhurst expulsion) or traded.", 2, -1);
     Card cc4 = new Card(0,"Grand Opera Opening", "Each player pays you $50.", 8, -1);
     Card cc5 = new Card(0,"Street Repairs", "Pay $40 for each house, $115 for each hotel you own.", 9, -1);
     Card cc6 = new Card(0,"Stolen Goods", "Your car got broken into in Westport. Pay $50 to replace your lost goods.", 6, 50);
@@ -1040,22 +1126,22 @@ public class GameController {
     Card cc14 = new Card(0,"Stocks", "You gamed the market and got $45!", 0, 45);
     Card cc15 = new Card(0,"Bank Error", "Get $200 from the bank's mistake (just don't tell anyone).", 0, 200);
     Card cc16 = new Card(0,"Thanks Grandma", "Your grandma gave you $100 for Christmas! But it's summer...", 0, 100);
-    Card c1 = new Card(0,"Go to Miege", "You got expelled from Rockhurst.\nGo to Miege.\nDo not pass Go.\nDo not collect $200.", 1, -1);
-    Card c2 = new Card(0,"Chairman of the Board", "Pay each player $50 to get their vote.", 7, -1);
-    Card c3 = new Card(0,"Get Out of Miege Free", "This card may be kept (in case of Rockhurst expulsion) or traded.", 2, -1);
-    Card c4 = new Card(0,"General Repairs", "Pay $25 for each house, $100 for each hotel you own.", 9, -1);
-    Card c5 = new Card(0,"Poor Tax", "Pay the $15 poor tax.", 6, 15);
-    Card c6 = new Card(0,"Advance to Hickman Mills Drive", "If you pass Go, get $200.", 3, 11);
-    Card c7 = new Card(0,"Take a ride on the Streetcar", "If you pass Go, get $200.", 3, 5);
-    Card c8 = new Card(0,"Take a stroll on Ward Parkway", "Good luck...", 3, 39);
-    Card c9 = new Card(0,"Advance to Go", "Collect $200!", 3, 0);
-    Card c10 = new Card(0,"Advance to 75th Street", "Woo hoo!", 3, 24);
-    Card c11 = new Card(0,"Bank Pays You Dividend of $50", "Congrats!", 0, 50);
-    Card c12 = new Card(0,"Building Loan", "Collect $150 from your matured building loan.", 0, 150);
-    Card c13 = new Card(0,"Advance to Nearest Utility", "Let's hope nobody owns it...", 4, 9);
-    Card c14 = new Card(0,"Advance to the Nearest Public Transit", "If owned, pay double the rent.", 4, 8);
-    Card c15 = new Card(0,"Advance to the Nearest Public Transit", "If owned, pay double the rent.", 4, 8);
-    Card c16 = new Card(0,"Go Back 3 Spaces", "Good luck!", 5, -1);
+    Card c1 = new Card(1,"Go to Miege", "You got expelled from Rockhurst.\nGo to Miege.\nDo not pass Go.\nDo not collect $200.", 1, -1);
+    Card c2 = new Card(1,"Chairman of the Board", "Pay each player $50 to get their vote.", 7, -1);
+    Card c3 = new Card(1,"Get Out of Miege Free", "This card may be kept (in case of Rockhurst expulsion) or traded.", 2, -1);
+    Card c4 = new Card(1,"General Repairs", "Pay $25 for each house, $100 for each hotel you own.", 9, -1);
+    Card c5 = new Card(1,"Poor Tax", "Pay the $15 poor tax.", 6, 15);
+    Card c6 = new Card(1,"Advance to Hickman Mills Drive", "If you pass Go, get $200.", 3, 11);
+    Card c7 = new Card(1,"Take a ride on the Streetcar", "If you pass Go, get $200.", 3, 5);
+    Card c8 = new Card(1,"Take a stroll on Ward Parkway", "Good luck...", 3, 39);
+    Card c9 = new Card(1,"Advance to Go", "Collect $200!", 3, 0);
+    Card c10 = new Card(1,"Advance to 75th Street", "Woo hoo!", 3, 24);
+    Card c11 = new Card(1,"Bank Pays You Dividend of $50", "Congrats!", 0, 50);
+    Card c12 = new Card(1,"Building Loan", "Collect $150 from your matured building loan.", 0, 150);
+    Card c13 = new Card(1,"Advance to Nearest Utility", "Let's hope nobody owns it...", 4, 9);
+    Card c14 = new Card(1,"Advance to the Nearest Public Transit", "If owned, pay double the rent.", 4, 8);
+    Card c15 = new Card(1,"Advance to the Nearest Public Transit", "If owned, pay double the rent.", 4, 8);
+    Card c16 = new Card(1,"Go Back 3 Spaces", "Good luck!", 5, -1);
     ArrayList<Card> chests = new ArrayList<Card>(Arrays.asList(cc1, cc2, cc3, cc4, cc5,cc6, cc7, cc8, cc9, cc10,cc11, cc12, cc13, cc14, cc15,cc16));
     ArrayList<Card> chances = new ArrayList<Card>(Arrays.asList(c1, c2, c3, c4, c5,c6, c7, c8, c9, c10,c11, c12, c13, c14, c15,c16));
     //chests.add(cc1);

@@ -17,11 +17,15 @@ public class Card {
         return name;
     }
 
+    public int getCoc() {
+        return chestOrChance;
+    }
+
     public String getDescription() {
         return description;
     }
 
-    public int getAmtPosColor() {
+    public int getAmc() {
         return amtPosColor;
     }
 
