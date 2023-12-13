@@ -251,7 +251,7 @@ class GridController {
         //check for houses
         for(int i = 0; i < 40; i++) {
             Property prop = getByPos(i);
-            if(prop.getHouses() > 0) {
+            if(prop.getCost() > 0) {
                 int startingRow = -1;
                 int startingColumn = -1;
                 String color = "";
@@ -294,6 +294,8 @@ class GridController {
                         case 5: color = "\u001B[48;5;226;38;5;34m";break;
                         case 6: color = "\u001B[48;5;22;38;5;34m";break;
                         case 7: color = "\u001B[48;5;4;38;5;34m";break;
+                        case 8: color = "\u001B[48;5;16;38;5;16m";break;
+                        case 9: color = "\u001B[48;5;16;38;5;16m";break;
                         default: color = "";break;
                     }
                 } else {
@@ -306,8 +308,13 @@ class GridController {
                         case 5: color = "\u001B[48;5;226;38;5;88m";break;
                         case 6: color = "\u001B[48;5;22;38;5;88m";break;
                         case 7: color = "\u001B[48;5;4;38;5;88m";break;
+                        case 8: color = "\u001B[48;5;16;38;5;16m";break;
+                        case 9: color = "\u001B[48;5;16;38;5;16m";break;
                         default: color = "";break;
                     }
+                }
+                for(int j = 0; j < 4; j++) {
+                    setCell(startingRow + (j * incrementRow), startingColumn + (j * incrementColumn), ' ', color);
                 }
                 if(prop.getHouses() != 5) {
                     for(int j = 0; j < prop.getHouses(); j++) {
@@ -410,7 +417,11 @@ class GridController {
                 startingColumn = model.getColumns() - 4;
             }
             if(pos != 10) {
-                setCell(startingRow, startingColumn + p.getID() - 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
+                if(players.size() > 3) {
+                    setCell(startingRow, startingColumn + p.getID() - 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
+                } else if(players.size() == 3) {
+                    setCell(startingRow, startingColumn + p.getID(), p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
+                }
             }
 
             
@@ -556,7 +567,7 @@ public class Main {
         a.setMoney(-15);*/
         //a.setJailed(true);
         //a.addProperty(prop1);
-        a.addProperty(prop2);
+        /*a.addProperty(prop2);
         a.addProperty(prop3);
         a.addProperty(prop4);
         a.addProperty(prop5);
@@ -570,7 +581,7 @@ public class Main {
         a.addProperty(prop18);
         a.addProperty(prop26);
         a.addProperty(prop27);
-        a.addProperty(prop28);
+        a.addProperty(prop28);*/
 
 
         int num = -1;

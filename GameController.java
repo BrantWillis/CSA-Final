@@ -113,6 +113,19 @@ public class GameController {
         }
         controller.updateView();
         executePos(currPlayer, currPlayer.getPosition(), false, false); //do actions for current square
+        if(currPlayer.getGo() && !currPlayer.getJailed()) { //check if passed go
+            currPlayer.setGo(false);
+            currPlayer.setMoney(currPlayer.getMoney() + 200);
+            controller.updateView();
+            int l = currPlayer.getLastPos();
+            if (currPlayer.getPosition() != 0 && (l==2||l==7||l==17||l==33||l==22||l==36)) {//coming off chance or chest
+                System.out.print(currPlayer.getName() + " got $200 for passing Go!");
+            } else {
+                System.out.print(currPlayer.getName() + " got $500 for lading on Go!");
+            }
+            System.out.println(" Press enter to continue.");
+            scan.nextLine();
+        }
         while(playerOptions.get(Integer.parseInt(input1) - 1) != 7) { //give options until player ends turn
             input1 = "-1";
             playerOptions.clear();
