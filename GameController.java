@@ -44,7 +44,7 @@ public class GameController {
             doublesCount++;
         }
         controller.updateView();
-        System.out.println(currPlayer.getName() + " rolled a(n) " + die1 + " and a(n) " + die2 + ". Press enter to continue");
+        System.out.println(currPlayer.getName() + " rolled a " + die1 + " and a " + die2 + ". Press enter to continue");
         scan.nextLine();
         if (doublesCount == 3) { //third doubles
             currPlayer.setJailed(true);
