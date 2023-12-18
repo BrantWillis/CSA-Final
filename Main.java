@@ -346,7 +346,7 @@ class GridController {
             }
             if(pos == 10) {
                 if(!p.getLastJail()) {
-                    switch(p.getID()) {
+                    switch(i) {
                         case 1: setCell(model.getRows() - 4, 1, ' ', "\u001B[48;5;255;38;5;16m");break;
                         case 2: setCell(model.getRows() - 3, 1, ' ', "\u001B[48;5;255;38;5;16m");break;
                         case 3: setCell(model.getRows() - 2, 2, ' ', "\u001B[48;5;255;38;5;16m");break;
@@ -354,7 +354,7 @@ class GridController {
                         default: break;
                     }
                 } else {
-                    switch(p.getID()) {
+                    switch(i) {
                         case 1: setCell(model.getRows() - 4, 2, ' ', "\u001B[48;5;202;38;5;16m");break;
                         case 2: setCell(model.getRows() - 3, 2, ' ', "\u001B[48;5;202;38;5;16m");break;
                         case 3: setCell(model.getRows() - 4, 3, ' ', "\u001B[48;5;202;38;5;16m");break;
@@ -376,7 +376,9 @@ class GridController {
                 startingColumn = model.getColumns() - 4;
             }
             if(pos != 10) {
-                setCell(startingRow, startingColumn + p.getID() - 1, ' ', "\u001B[48;5;255;38;5;16m");
+                if(startingColumn + i - 1 > 0) {
+                    setCell(startingRow, startingColumn + i - 1, ' ', "\u001B[48;5;255;38;5;16m");
+                }
             }
 
             //display current position
@@ -387,7 +389,7 @@ class GridController {
             }
             if(pos == 10) {
                 if(!p.getJailed()) {
-                    switch(p.getID()) {
+                    switch(i) {
                         case 1: setCell(model.getRows() - 4, 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");break;
                         case 2: setCell(model.getRows() - 3, 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");break;
                         case 3: setCell(model.getRows() - 2, 2, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");break;
@@ -395,7 +397,7 @@ class GridController {
                         default: break;
                     }
                 } else {
-                    switch(p.getID()) {
+                    switch(i) {
                         case 1: setCell(model.getRows() - 4, 2, p.getPiece().getSymbol(), "\u001B[48;5;202;38;5;16m");break;
                         case 2: setCell(model.getRows() - 3, 2, p.getPiece().getSymbol(), "\u001B[48;5;202;38;5;16m");break;
                         case 3: setCell(model.getRows() - 4, 3, p.getPiece().getSymbol(), "\u001B[48;5;202;38;5;16m");break;
@@ -417,11 +419,13 @@ class GridController {
                 startingColumn = model.getColumns() - 4;
             }
             if(pos != 10) {
-                if(players.size() > 3) {
-                    setCell(startingRow, startingColumn + p.getID() - 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
-                } else if(players.size() == 3) {
-                    setCell(startingRow, startingColumn + p.getID(), p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
+                if(startingColumn + i - 1 > 0) {
+                    /*Scanner scan = new Scanner(System.in);
+                    System.out.println("player " + i + " has a problem:pos" + pos);
+                    scan.nextLine();*/
+                    setCell(startingRow, startingColumn + i - 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
                 }
+                    //setCell(startingRow, startingColumn + i - 1, p.getPiece().getSymbol(), "\u001B[48;5;248;38;5;16m");
             }
 
             
